@@ -241,7 +241,7 @@ def products():
             return response
 
 
-@app.route("/product/<int:product_id>/", methods=["GET"])
+@app.route("/product/<int:user_id>/", methods=["GET"])
 def get_user_product(user_id):
     response = {}
 
@@ -251,10 +251,10 @@ def get_user_product(user_id):
             conn.row_factory = dict_factory
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM product WHERE user_id=" + str(user_id))
-            user_product = cursor.fetchall()
+            user_products = cursor.fetchall()
 
         response["status_code"] = 200
-        response["data"] = user_product
+        response["data"] = user_products
         return response
 
 
