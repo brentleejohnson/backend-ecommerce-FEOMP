@@ -241,6 +241,23 @@ def products():
             return response
 
 
+@app.route("/product/<int:product_id>/", methods=["GET"])
+def get_user_product(user_id):
+    response = {}
+
+    # GETS ALL PRODUCTS
+    if request.method == "GET":
+        with sqlite3.connect("pos.db") as conn:
+            conn.row_factory = dict_factory
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM product WHERE user_id=" + str(user_id))
+            user_product = cursor.fetchall()
+
+        response["status_code"] = 200
+        response["data"] = user_product
+        return response
+
+
 if __name__ == "__main__":
     app.debug = True
     app.run()
