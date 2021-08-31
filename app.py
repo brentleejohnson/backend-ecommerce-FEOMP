@@ -101,7 +101,7 @@ app.logger.setLevel(logging.ERROR)
 app.debug = True
 app.config["SECRET_KEY"] = "super-secret"
 # This allows for the token key to have an extended time limit
-app.config["JWT_EXPIRATION_DELTA"] = datetime.timedelta(seconds=4000)
+# app.config["JWT_EXPIRATION_DELTA"] = datetime.timedelta(seconds=4000)
 CORS(app)
 # For the mail
 # app.config["MAIL_SERVER"] = "smtp.gmail.com"
