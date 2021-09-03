@@ -6,6 +6,8 @@ import sqlite3
 import datetime
 import sys
 import logging
+import cloudinary
+from cloudinary import uploader
 
 from flask import Flask, request, jsonify
 from flask_jwt import JWT, jwt_required, current_identity
@@ -27,21 +29,6 @@ class User(object):
         self.id = id
         self.username = username
         self.password = password
-
-
-# Fetching the information from the user table in the database
-# def fetch_users():
-#     with sqlite3.connect("pos.db") as conn:
-#         cursor = conn.cursor()
-#         cursor.execute("SELECT * FROM user")
-#         users = cursor.fetchall()
-#
-#         new_data = []
-#
-#         for data in users:
-#             print(f"{data[0]}, {data[2]}, {data[3]}")
-#             new_data.append(User(data[0], data[2], data[3]))
-#     return new_data
 
 
 # Creating the USER table
@@ -75,23 +62,6 @@ def init_product_table():
 # Calling the tables from the database
 init_user_table()
 init_product_table()
-# users = fetch_users()
-
-# username_table = { u.username: u for u in users }
-# userid_table = { u.id: u for u in users }
-
-
-# # Authentication
-# def authenticate(username, password):
-#     user = username_table.get(username, None)
-#     if user and hmac.compare_digest(user.password.encode("utf-8"), password.encode("utf-8")):
-#         return user
-
-
-# def identity(payload):
-#     user_id = payload["identity"]
-#     return userid_table.get(user_id, None)
-
 
 # Containing information that is compulsory for allowing the email to work /
 # API Setup
@@ -103,16 +73,6 @@ app.config["SECRET_KEY"] = "super-secret"
 # This allows for the token key to have an extended time limit
 # app.config["JWT_EXPIRATION_DELTA"] = datetime.timedelta(seconds=4000)
 CORS(app)
-# For the mail
-# app.config["MAIL_SERVER"] = "smtp.gmail.com"
-# app.config["MAIL_PORT"] = 465
-# app.config["MAIL_USERNAME"] = "huntermoonspear@gmail.com"
-# app.config["MAIL_PASSWORD"] = "dianadragonheart"
-# app.config["MAIL_USE_TLS"] = False
-# app.config["MAIL_USE_SSL"] = True
-# mail = Mail(app)
-
-# jwt = JWT(app, authenticate, identity)
 
 
 @app.route("/", methods=["GET"])
@@ -223,6 +183,16 @@ def products():
             description = request.json["description"]
             price = request.json["price"]
 
+            # Upload image to cloudinary
+            cloudinary.config(cloud_name="dlmtwdavm", api_key="263954874477652",
+                              api_secret="SKaOWOepasPrCPdE--p8NQhRd9w")
+            upload_result = None
+
+            app.logger.info("%s file_to_upload", image)
+            if image:
+                upload_result = cloudinary.uploader.upload(image)  # Upload results
+                app.logger.info(upload_result)
+
             with sqlite3.connect("pos.db") as conn:
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO product("
@@ -230,7 +200,7 @@ def products():
                                "image,"
                                "name,"
                                "description,"
-                               "price) VALUES(?, ?, ?, ?, ?)", (user_id, image, name, description, price))
+                               "price) VALUES(?, ?, ?, ?, ?)", (user_id, upload_result["url"], name, description, price))
                 conn.commit()
                 response["message"] = "Successfully added new product into database"
                 response["status_code"] = 201
