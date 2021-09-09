@@ -200,7 +200,8 @@ def products():
                                "image,"
                                "name,"
                                "description,"
-                               "price) VALUES(?, ?, ?, ?, ?)", (user_id, upload_result["url"], name, description, price))
+                               "price) VALUES(?, ?, ?, ?, ?)", (user_id, upload_result["url"], name, description,
+                                                                price))
                 conn.commit()
                 response["message"] = "Successfully added new product into database"
                 response["status_code"] = 201
