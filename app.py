@@ -168,10 +168,10 @@ def products():
             conn.row_factory = dict_factory
             cursor = conn.cursor()
             cursor.execute("SELECT * FROM product")
-            products = cursor.fetchall()
+            all_products = cursor.fetchall()
 
         response["status_code"] = 200
-        response["data"] = products
+        response["data"] = all_products
         return response
 
     # ADDS A PRODUCT
