@@ -52,7 +52,7 @@ def init_product_table():
                  "image TEXT NOT NULL,"
                  "name TEXT NOT NULL,"
                  "description TEXT NOT NULL,"
-                 "price INTEGER NOT NULL")
+                 "price INTEGER NOT NULL)")
     print("Product table created successfully.")
     conn.close()
 
