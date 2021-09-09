@@ -49,10 +49,12 @@ def init_product_table():
     print("Opened database successfully")
 
     conn.execute("CREATE TABLE IF NOT EXISTS product(product_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                 "user_id INTEGER NOT NULL,"
                  "image TEXT NOT NULL,"
                  "name TEXT NOT NULL,"
                  "description TEXT NOT NULL,"
-                 "price INTEGER NOT NULL)")
+                 "price INTEGER NOT NULL,"
+                 "FOREIGN KEY (user_id) REFERENCES user (user_id))")
     print("Product table created successfully.")
     conn.close()
 
@@ -175,6 +177,7 @@ def products():
     # ADDS A PRODUCT
     if request.method == "POST":
         try:
+            user_id = request.json["user_id"]
             image = request.json["image"]
             name = request.json["name"]
             description = request.json["description"]
@@ -193,10 +196,11 @@ def products():
             with sqlite3.connect("pos.db") as conn:
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO product("
+                               "user_id,"
                                "image,"
                                "name,"
                                "description,"
-                               "price) VALUES(?, ?, ?, ?)", (upload_result["url"], name, description, price))
+                               "price) VALUES(?, ?, ?, ?, ?)", (user_id, upload_result["url"], name, description, price))
                 conn.commit()
                 response["message"] = "Successfully added new product into database"
                 response["status_code"] = 201
@@ -207,21 +211,21 @@ def products():
             return response
 
 
-# @app.route("/product/<int:user_id>/", methods=["GET"])
-# def get_user_product(user_id):
-#     response = {}
+@app.route("/product/<int:user_id>/", methods=["GET"])
+def get_user_product(user_id):
+    response = {}
 
     # GETS ALL PRODUCTS
-    # if request.method == "GET":
-    #     with sqlite3.connect("pos.db") as conn:
-    #         conn.row_factory = dict_factory
-    #         cursor = conn.cursor()
-    #         cursor.execute("SELECT * FROM product WHERE user_id=" + str(user_id))
-    #         user_products = cursor.fetchall()
-    #
-    #     response["status_code"] = 200
-    #     response["data"] = user_products
-    #     return response
+    if request.method == "GET":
+        with sqlite3.connect("pos.db") as conn:
+            conn.row_factory = dict_factory
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM product WHERE user_id=" + str(user_id))
+            user_products = cursor.fetchall()
+
+        response["status_code"] = 200
+        response["data"] = user_products
+        return response
 
 
 if __name__ == "__main__":
